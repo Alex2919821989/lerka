@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Для Лерочки</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#efe6f2; --ink:#2d1b3d; --soft:#6d5a7c; --card:#fbf7fc; --line:#d9c8e0; --accent:#c2406f; --on-accent:#fff;
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --hand:'Caveat','Segoe Script','Bradley Hand',cursive;
+  --sans:'Montserrat',-apple-system,'Helvetica Neue',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#1d1226;--ink:#f3e8f6;--soft:#b9a4c6;--card:#2b1a38;--line:#47305a;--accent:#f08ab0;--on-accent:#2a0f1c}
+}
+:root[data-theme="dark"]{--bg:#1d1226;--ink:#f3e8f6;--soft:#b9a4c6;--card:#2b1a38;--line:#47305a;--accent:#f08ab0;--on-accent:#2a0f1c}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:auto;max-width:100%;overflow-x:hidden}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* падающие сердечки */
+#rain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#rain span{position:absolute;top:-30px;color:var(--accent);opacity:.5;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(40deg)}}
+
+/* вход */
+#intro{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;
+  padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));transition:opacity .8s,visibility .8s}
+#intro.gone{opacity:0;visibility:hidden}
+#intro h1{font-family:var(--serif);font-weight:700;font-size:clamp(46px,15vw,84px);line-height:1;margin:0 0 10px;letter-spacing:-.01em}
+#intro p{font-family:var(--hand);font-size:26px;color:var(--soft);margin:0 0 36px}
+.btn{background:var(--accent);color:var(--on-accent);padding:15px 30px;border-radius:999px;font-weight:600;font-size:15px;letter-spacing:.02em;transition:transform .15s}
+.btn:active{transform:scale(.95)}
+#intro .btn{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.05)}}
+
+/* страница */
+main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:36px 18px 120px}
+header.top{text-align:center;margin-bottom:34px}
+header.top h2{font-family:var(--serif);font-size:clamp(34px,10vw,48px);margin:0;line-height:1.1}
+header.top p{font-family:var(--hand);font-size:24px;color:var(--soft);margin:6px 0 0}
+
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:24px 22px;margin-bottom:26px;max-width:100%}
+.card:nth-of-type(2){border-radius:26px 26px 26px 6px}
+.card:nth-of-type(3){border-radius:6px 26px 26px 26px}
+.card h3{font-family:var(--serif);font-size:28px;line-height:1.15;margin:0 0 12px}
+.card p{margin:0 0 14px;overflow-wrap:anywhere}
+.hand{font-family:var(--hand);font-size:23px;line-height:1.35;color:var(--ink)}
+.ghost{border:1.5px solid var(--accent);color:var(--accent);padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px}
+.ghost:active{background:var(--accent);color:var(--on-accent)}
+
+/* карточка 1 */
+#pw{display:none;margin-top:16px;gap:10px;flex-wrap:wrap}
+#pw.show{display:flex}
+#pw input{flex:1 1 150px;min-width:0;font:inherit;font-size:16px;padding:13px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;letter-spacing:.12em}
+#pw.bad{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#hint{font-size:13px;color:var(--soft);min-height:20px;margin:8px 0 0}
+#letter{display:grid;grid-template-rows:0fr;transition:grid-template-rows .9s ease}
+#letter.open{grid-template-rows:1fr}
+#letter>div{overflow:hidden}
+#letter .inner{padding-top:6px;font-family:var(--serif);font-size:20px;line-height:1.65}
+#letter .sign{font-family:var(--hand);font-size:28px;color:var(--accent);text-align:right;margin:8px 0 0}
+
+/* карточка 2 */
+.player{display:flex;align-items:center;gap:14px;background:var(--bg);border-radius:18px;padding:12px 14px;margin:6px 0 16px}
+.pbtn{flex:0 0 46px;width:46px;height:46px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:17px;display:grid;place-items:center}
+.pmid{flex:1;min-width:0}
+.ptitle{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:6px;border-radius:3px;background:var(--line);margin:8px 0 4px;position:relative;touch-action:none}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:var(--accent)}
+.time{font-size:12px;color:var(--soft);display:flex;justify-content:space-between}
+
+.lyrics{white-space:pre-line;text-align:center;overflow-wrap:anywhere}
+.lyrics:empty{display:none}
+.lyrics.big{margin:0 0 28px;padding:18px 16px;border:1.5px dashed var(--line);border-radius:20px}
+/* карточка 3 */
+#miss{min-height:96px;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px 4px;font-family:var(--hand);font-size:27px;line-height:1.3;color:var(--accent)}
+.wishes{margin:18px 0 0;padding:0;list-style:none}
+.wishes li{padding:10px 0 10px 28px;border-top:1px solid var(--line);position:relative}
+.wishes li::before{content:"♥";position:absolute;left:4px;color:var(--accent)}
+
+/* финал */
+#finale{position:fixed;inset:0;z-index:55;background:var(--bg);overflow-y:auto;overflow-x:hidden;visibility:hidden;opacity:0;transition:opacity .8s,visibility .8s;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(40px + env(safe-area-inset-top,0px)) 22px calc(40px + env(safe-area-inset-bottom,0px))}
+#finale.show{visibility:visible;opacity:1}
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.fx-item{position:absolute;bottom:-60px;animation:rise linear forwards;color:var(--accent)}
+@keyframes rise{50%{transform:translate(var(--sx),-55vh) rotate(12deg)}to{transform:translate(calc(var(--sx) * -1),-115vh) rotate(-12deg)}}
+.bigheart{font-size:84px;line-height:1;margin:auto 0 14px;animation:beat 1.2s ease-in-out infinite;position:relative}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+#finale h2{font-family:var(--serif);font-size:clamp(34px,10vw,52px);line-height:1.1;margin:0 0 8px;position:relative;animation:rise-in 1.2s .3s both}
+#finale .from{font-family:var(--hand);font-size:34px;color:var(--accent);margin:0 0 22px;position:relative;animation:rise-in 1.2s .9s both}
+@keyframes rise-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#finale .lyrics{position:relative;max-width:440px;margin:0 0 22px}
+#finale .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:0 0 auto;position:relative}
+.nazhmi{text-align:center;margin:22px 0 4px}
+#game{position:fixed;inset:0;z-index:58;background:var(--bg);visibility:hidden;opacity:0;transition:opacity .5s,visibility .5s;overflow:hidden;touch-action:manipulation}
+#game.show{visibility:visible;opacity:1}
+#gtop{position:absolute;left:0;right:0;top:0;padding:calc(14px + env(safe-area-inset-top,0px)) 18px 0;display:flex;justify-content:space-between;align-items:center;z-index:2;pointer-events:none}
+#gcount{font-family:var(--hand);font-size:30px;color:var(--accent)}
+#gexit{pointer-events:auto;font-size:14px;color:var(--soft);padding:10px 0 10px 10px}
+#gbar{position:absolute;left:18px;right:18px;top:calc(62px + env(safe-area-inset-top,0px));height:6px;border-radius:3px;background:var(--line);z-index:2}
+#gbar i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent);transition:width .25s}
+#ghint{position:absolute;left:0;right:0;top:40%;text-align:center;font-family:var(--hand);font-size:36px;line-height:1.2;color:var(--ink);pointer-events:none;transition:opacity .8s;z-index:1}
+#gfield{position:absolute;inset:0}
+.gh{position:absolute;top:-80px;padding:12px;font-size:44px;line-height:1;color:var(--accent);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;animation:gfall linear forwards}
+@keyframes gfall{to{transform:translateY(calc(100vh + 160px))}}
+@keyframes gcatch{to{transform:scale(2.4) rotate(20deg);opacity:0}}
+#end{position:fixed;inset:0;z-index:70;background:#000;visibility:hidden;opacity:0;transition:opacity 1.2s,visibility 1.2s;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;overflow:hidden}
+#end.show{visibility:visible;opacity:1}
+#efx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;color:#ffd6e5;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:.9;transform:scale(1)}}
+.eh{position:absolute;bottom:-60px;color:#ff7aa8;animation:rise linear forwards;filter:drop-shadow(0 0 10px rgba(255,100,160,.7))}
+#etext{position:relative;max-width:520px;color:#fff1f6;font-family:var(--serif);font-size:clamp(40px,11vw,64px);line-height:1.2;font-weight:700;text-shadow:0 0 28px rgba(255,120,170,.55)}
+#etext.small{font-size:clamp(28px,7.5vw,42px);font-weight:500}
+#etext.sign2{font-family:var(--hand);font-size:clamp(40px,11vw,60px);color:#ff9fc0;font-weight:500}
+#etext .ew{display:inline-block;opacity:0;animation:ewin 1s cubic-bezier(.2,.8,.2,1) var(--d) both}
+@keyframes ewin{from{opacity:0;transform:translateY(26px) scale(.8);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+#etext.out{animation:eout .9s ease-in forwards}
+@keyframes eout{to{opacity:0;transform:translateY(-18px);filter:blur(8px)}}
+#eend{position:absolute;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom,0px));display:flex;gap:12px;justify-content:center;opacity:0;transition:opacity 1.2s;pointer-events:none;z-index:2}
+#eend.show{opacity:1;pointer-events:auto}
+#finale h2{animation:none}
+.w{display:inline-block;white-space:nowrap}
+.ltr{display:inline-block;opacity:0}
+#finale.show .ltr{animation:ltrin .9s cubic-bezier(.2,.8,.2,1) var(--d) both,bob 3s ease-in-out calc(var(--d) + 1s) infinite}
+@keyframes ltrin{from{opacity:0;transform:translateY(46px) scale(.4) rotate(-14deg);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#finale .from{opacity:0}
+#finale.show .from{animation:write 2s 2.8s both}
+@keyframes write{from{opacity:1;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+.bloom{position:absolute;color:var(--accent);animation:bloom 2.4s ease-out forwards}
+@keyframes bloom{0%{transform:scale(0) rotate(-30deg);opacity:0}25%{transform:scale(1.35) rotate(8deg);opacity:1}100%{transform:translateY(-70px) scale(1) rotate(0);opacity:0}}
+.peek{--flip:1;position:absolute;bottom:0;font-size:76px;line-height:1;transform:translateY(105%) scaleX(var(--flip))}
+#finale.show .peek{animation:peek 1.1s cubic-bezier(.3,1.5,.5,1) 3s both,wig 4s ease-in-out 4.5s infinite}
+@keyframes peek{to{transform:translateY(28%) scaleX(var(--flip))}}
+@keyframes wig{0%,100%{transform:translateY(28%) scaleX(var(--flip)) rotate(0)}50%{transform:translateY(28%) scaleX(var(--flip)) rotate(7deg)}}
+.walker{position:absolute;bottom:4px;left:-70px;font-size:44px;line-height:1;animation:walk 14s linear forwards}
+@keyframes walk{to{transform:translateX(calc(100vw + 140px))}}
+.walker .flip{display:inline-block;transform:scaleX(-1)}
+.walker .hop{display:inline-block;animation:hop .55s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-9px)}}
+
+#finale.show .bigheart{animation:heartin 1.1s cubic-bezier(.3,1.6,.5,1) both,beat 1.2s ease-in-out 1.1s infinite}
+@keyframes heartin{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+/* плавающий плеер */
+#dock{position:fixed;z-index:40;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;max-width:calc(100% - 24px)}
+#dock .pbtn{flex-basis:40px;width:40px;height:40px;font-size:14px}
+#dock label{font-size:12px;color:var(--soft)}
+#vol{width:84px;accent-color:var(--accent)}
+#dock.hidden{display:none}
+
+.pop{position:fixed;z-index:60;pointer-events:none;font-size:22px;animation:pop 1.4s ease-out forwards}
+@keyframes pop{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+
+</style>
+</head>
+<body>
+<div id="rain" aria-hidden="true"></div>
+
+<!-- ГЛАВНЫЙ ЭКРАН -->
+<section id="intro">
+  <h1>Для Лерочки ❤️</h1>
+  <p>тут кое-что тебя ждёт</p>
+  <button class="btn" id="enter">Нажми сюда, Лерочка</button>
+</section>
+
+<!-- ФОНОВАЯ МУЗЫКА. Замени ссылку в src на свой mp3 (положи файл рядом или вставь прямую ссылку) -->
+<audio id="bgm" src="music/fragment.mp3" loop preload="auto" playsinline></audio>
+
+<main>
+  <header class="top">
+    <h2>Лерочка, привет</h2>
+    <p>я сделал это руками, для тебя</p>
+  </header>
+  <!-- СЛОВА ФОНОВОЙ ПЕСНИ (отрывок Моргенштерна): вставь текст между тегами. Пока пусто, блок скрыт. -->
+  <div class="lyrics hand big"><!-- сюда вставь слова отрывка --></div>
+
+  <!-- ОТКРЫТКА 1: секретный пароль -->
+  <article class="card">
+    <h3>Секретное послание (только для тебя)</h3>
+    <p>Тут спрятано кое-что важное. Нужен пароль.</p>
+    <button class="ghost" id="unlock">Ввести пароль</button>
+    <div id="pw">
+      <!-- ПАРОЛЬ меняется в JS: const PASSWORD -->
+      <input id="pwin" type="text" inputmode="decimal" autocomplete="off" placeholder="чч.мм" aria-label="Пароль">
+      <button class="btn" id="pwgo">Открыть</button>
+    </div>
+    <p id="hint"></p>
+    <div id="letter"><div><div class="inner">
+      <!-- ТЕКСТ ПИСЬМА: меняй как хочешь -->
+      <p>Лерочка, ты правда самая красивенькая. Не «ну вроде ничего», а прямо такая, что хочется остановиться и смотреть. И дело не только в лице, а в том, как ты смеёшься, как удивляешься, как переживаешь за всех подряд.</p>
+      <p>Ты самая лучшая. Настоящая принцесса, только без короны и без вот этого «ах, не трогайте меня». С тобой тепло, легко и можно быть собой, а это редкость.</p>
+      <p>Ты добрая, умная, смешная, и ты даже не представляешь, сколько людей рядом с тобой становятся лучше. Я в их числе. Мне очень повезло, что ты есть в моей жизни.</p>
+      <p>Помни: ты сильнее, чем думаешь, и красивее, чем видишь в зеркале в плохой день. Если вдруг сомневаешься, возвращайся сюда и перечитывай.</p>
+      <p>Знаешь, что в тебе самое классное? Ты не пытаешься казаться. Ты просто настоящая: переживаешь, радуешься, злишься, смеёшься до слёз, и всё это искренне. Рядом с такими людьми хочется быть тоже настоящим.</p>
+      <p>Ты умеешь поддержать так, что становится легче дышать. Одним сообщением, одной шуткой, одним «ну чего ты, всё нормально будет». Ты даже не замечаешь, как много в этом тепла, а я замечаю и очень ценю.</p>
+      <p>Если бы можно было выбрать подругу заново, я бы выбрал тебя ещё раз. Без раздумий. Потому что с тобой можно и поболтать часами ни о чём, и помолчать, и это не будет неловко.</p>
+      <p>Пусть у тебя всё получается. Пусть мечты сбываются, пусть рядом будут люди, которые видят в тебе то же, что вижу я: что ты удивительная. И пусть ты почаще это чувствуешь, а не только читаешь на сайте.</p>
+      <p>Спасибо тебе за всё. И за то, что ты такая, какая есть.</p>
+      <p class="sign">от Лёшки ❤️</p>
+      <div class="nazhmi"><button class="btn" id="finbtn">Нажми ❤️</button></div>
+    </div></div></div>
+  </article>
+
+  <!-- ОТКРЫТКА 2: музыкальная -->
+  <article class="card">
+    <h3>Наша школьная, особенная песня 🎵</h3>
+    <div class="player">
+      <button class="pbtn" id="p2btn" aria-label="Играть">▶</button>
+      <div class="pmid">
+        <div class="ptitle">Девочка в классе</div>
+        <div class="bar" id="p2bar"><i id="p2fill"></i></div>
+        <div class="time"><span id="p2cur">0:00</span><span id="p2dur">0:00</span></div>
+      </div>
+    </div>
+    <!-- ПЕСНЯ для открытки №2: замени src на свой mp3 -->
+    <audio id="song" src="music/devochka-v-klasse.mp3" preload="metadata" playsinline></audio>
+    <!-- ТЕКСТ-ВОСПОМИНАНИЕ: меняй на свой -->
+    <!-- СЛОВА ПЕСНИ: вставь припев «Девочки в классе» между тегами ниже. Пока пусто, блок скрыт. Переносы строк сохраняются. -->
+    <div class="lyrics hand"><!-- сюда вставь припев --></div>
+  </article>
+
+  <!-- ОТКРЫТКА 3: заметка и кнопка -->
+  <article class="card">
+    <h3>Если вдруг грустно или скучно</h3>
+    <div id="miss">Нажми на кнопку ниже</div>
+    <div style="text-align:center"><button class="btn" id="missbtn">Нажми, если скучаешь</button></div>
+    <ul class="wishes">
+      <!-- ПОЖЕЛАНИЯ: добавляй или убирай <li> -->
+      <li>Пусть рядом будут те, с кем не нужно притворяться.</li>
+      <li>Пусть всё, о чём ты тихо мечтаешь, сбывается.</li>
+      <li>Пусть хороших дней будет больше, чем любых других.</li>
+    </ul>
+  </article>
+</main>
+
+<!-- ПЛАВАЮЩИЙ ВИДЖЕТ МУЗЫКИ (на iPhone ползунок громкости не работает: Safari ею не управляет, громкость регулируют кнопками телефона) -->
+<!-- ФИНАЛ: появляется по кнопке «Нажми» в конце письма -->
+<section id="finale" aria-hidden="true">
+  <div id="fx"><div class="peek" style="left:6%">🐱</div><div class="peek" style="right:6%;--flip:-1">😺</div></div>
+  <div class="bigheart">❤️</div>
+  <h2 id="fintitle" aria-label="Лерочка — самая лучшая девочка)">Лерочка — самая лучшая девочка)</h2>
+  <p class="from">от Лёшки</p>
+  <!-- СЛОВА ПЕСНИ «Девочка в классе» для финала: вставь текст между тегами. Пока пусто, блок скрыт. -->
+  <div class="lyrics hand" id="finlyrics"><!-- сюда вставь слова --></div>
+  <div class="row">
+    <button class="btn" id="gamebtn">🎮 Играть</button>
+    <button class="ghost" id="finplay">🎵 Пауза</button>
+    <button class="ghost" id="finclose">Закрыть</button>
+  </div>
+</section>
+
+<!-- ИГРА: поймай сердечки -->
+<section id="game" aria-hidden="true">
+  <div id="gtop"><span id="gcount">Поймано: 0 из 15</span><button id="gexit" aria-label="Выйти">✕ выйти</button></div>
+  <div id="gbar"><i id="gfill"></i></div>
+  <div id="ghint">Лови сердечки!<br>нажимай на них ❤️</div>
+  <div id="gfield"></div>
+</section>
+<!-- ФИНАЛ ПОСЛЕ ИГРЫ: чёрный экран и приятные слова. Тексты в JS: const LINES -->
+<section id="end" aria-hidden="true">
+  <div id="efx"></div>
+  <div id="etext"></div>
+  <div id="eend"><button class="ghost" id="eagain">Ещё раз</button><button class="ghost" id="eclose">Закрыть</button></div>
+</section>
+
+<div id="dock" class="hidden">
+  <button class="pbtn" id="dockbtn" aria-label="Пауза или играть">❚❚</button>
+  <label for="vol">звук</label>
+  <input id="vol" type="range" min="0" max="1" step="0.05" value="0.7">
+</div>
+
+<script>
+(function(){
+  // ====== НАСТРОЙКИ ======
+  var PASSWORD = "17.01"; // дата знакомства
+  var MISS = [ // случайные послания для кнопки «Нажми, если скучаешь»
+    "Я тоже по тебе скучаю ❤️",
+    "Ты справишься. Ты всегда справляешься.",
+    "Напиши мне прямо сейчас, я рад.",
+    "Ты лучшая, это не обсуждается.",
+    "Обнимаю тебя крепко-крепко 🤗",
+    "Сегодня обязательно будет хорошее, я уверен.",
+    "Улыбнись, тебе очень идёт 🌸",
+    "Ты у меня одна такая, помни об этом."
+  ];
+  // =======================
+
+  var $ = function(id){return document.getElementById(id)};
+  var bgm = $('bgm'), song = $('song'), dock = $('dock');
+  bgm.volume = 0.7;
+
+  /* сердечки */
+  var rain = $('rain'), glyphs = ['♥','❤','✦','♡'];
+  function drop(){
+    var s = document.createElement('span');
+    s.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
+    s.style.left = Math.random()*100 + '%';
+    s.style.fontSize = (10 + Math.random()*16) + 'px';
+    var d = 7 + Math.random()*7;
+    s.style.animationDuration = d + 's';
+    rain.appendChild(s);
+    setTimeout(function(){ s.remove() }, d*1000);
+  }
+  setInterval(drop, 900);
+
+  /* вход + разблокировка звука на iOS (play строго внутри клика) */
+  $('enter').addEventListener('click', function(){
+    var p = bgm.play();
+    if (p && p.catch) p.catch(function(){});
+    $('intro').classList.add('gone');
+    dock.classList.remove('hidden');
+    syncDock();
+  });
+
+  function syncDock(){ $('dockbtn').textContent = bgm.paused ? '▶' : '❚❚' }
+  $('dockbtn').addEventListener('click', function(){
+    if (bgm.paused){
+      song.pause();
+      var p = bgm.play(); if (p && p.catch) p.catch(function(){});
+    } else bgm.pause();
+    syncDock();
+  });
+  bgm.addEventListener('play', syncDock); bgm.addEventListener('pause', syncDock);
+  $('vol').addEventListener('input', function(e){ bgm.volume = +e.target.value; });
+
+  /* конфетти */
+  function burst(){
+    var set = ['❤️','💖','✨','🌸','💗','🎉'];
+    for (var i=0;i<34;i++){
+      var e = document.createElement('div');
+      e.className = 'pop';
+      e.textContent = set[i % set.length];
+      e.style.left = (30 + Math.random()*40) + '%';
+      e.style.top = '55%';
+      e.style.setProperty('--dx', (Math.random()*320 - 160) + 'px');
+      e.style.setProperty('--dy', (Math.random()*-420 - 60) + 'px');
+      e.style.setProperty('--r', (Math.random()*360 - 180) + 'deg');
+      document.body.appendChild(e);
+      (function(x){ setTimeout(function(){ x.remove() }, 1500) })(e);
+    }
+  }
+
+  /* открытка 1 */
+  $('unlock').addEventListener('click', function(){
+    $('pw').classList.add('show');
+    $('unlock').style.display = 'none';
+    $('pwin').focus();
+  });
+  function check(){
+    var v = $('pwin').value.trim().replace(/[,\/\-\s]+/g,'.');
+    if (v === PASSWORD || v === PASSWORD.replace('.0','.')){
+      $('pw').style.display = 'none';
+      $('hint').textContent = '';
+      $('letter').classList.add('open');
+      burst();
+    } else {
+      var pw = $('pw'); pw.classList.remove('bad'); void pw.offsetWidth; pw.classList.add('bad');
+      $('hint').textContent = 'Не подошло. Подсказка: день и месяц нашего знакомства, через точку.';
+    }
+  }
+  $('pwgo').addEventListener('click', check);
+  $('pwin').addEventListener('keydown', function(e){ if (e.key === 'Enter') check(); });
+
+  /* открытка 2: свой плеер */
+  function fmt(t){ if (!isFinite(t)) return '0:00'; var m = Math.floor(t/60), s = Math.floor(t%60); return m + ':' + (s<10?'0':'') + s; }
+  $('p2btn').addEventListener('click', function(){
+    if (song.paused){
+      bgm.pause(); syncDock();
+      var p = song.play(); if (p && p.catch) p.catch(function(){});
+    } else song.pause();
+  });
+  song.addEventListener('play', function(){ $('p2btn').textContent = '❚❚' });
+  song.addEventListener('pause', function(){ $('p2btn').textContent = '▶' });
+  song.addEventListener('ended', function(){ $('p2btn').textContent = '▶' });
+  song.addEventListener('loadedmetadata', function(){ $('p2dur').textContent = fmt(song.duration) });
+  song.addEventListener('timeupdate', function(){
+    $('p2cur').textContent = fmt(song.currentTime);
+    if (song.duration) $('p2fill').style.width = (song.currentTime/song.duration*100) + '%';
+  });
+  $('p2bar').addEventListener('click', function(e){
+    var r = this.getBoundingClientRect();
+    if (song.duration) song.currentTime = song.duration * Math.min(1, Math.max(0, (e.clientX - r.left)/r.width));
+  });
+
+  /* финал: сердечки, котики и песня */
+  var fin = $('finale'), fx = $('fx'), finTimer = null, fxN = 0;
+  var hearts = ['❤️','💖','💗','💕','♥','💓'], cats = ['🐱','😻','🐈','😽','🐾'];
+  function spawnFx(){
+    fxN++;
+    var cat = fxN % 5 === 0, e = document.createElement('div');
+    e.className = 'fx-item';
+    e.textContent = cat ? cats[Math.floor(Math.random()*cats.length)] : hearts[Math.floor(Math.random()*hearts.length)];
+    e.style.left = (Math.random()*90) + '%';
+    e.style.fontSize = (cat ? 36 : 16 + Math.random()*30) + 'px';
+    var d = 5 + Math.random()*4;
+    e.style.animationDuration = d + 's';
+    e.style.setProperty('--sx', (Math.random()*80 - 40) + 'px');
+    fx.appendChild(e);
+    setTimeout(function(){ e.remove() }, d*1000);
+  }
+  function setFinPlay(){ $('finplay').textContent = song.paused ? '🎵 Музыка' : '🎵 Пауза' }
+  var bloomTimer = null, walkTimer = null, walkFirst = null;
+  function buildTitle(){
+    var t = $('fintitle'); if (t.getAttribute('data-done')) return; t.setAttribute('data-done','1');
+    var words = t.textContent.split(' '), k = 0; t.textContent = '';
+    words.forEach(function(w, wi){
+      var ws = document.createElement('span'); ws.className = 'w'; ws.setAttribute('aria-hidden','true');
+      w.split('').forEach(function(ch){
+        var s = document.createElement('span'); s.className = 'ltr'; s.textContent = ch;
+        s.style.setProperty('--d', (0.5 + k*0.07) + 's'); k++; ws.appendChild(s);
+      });
+      t.appendChild(ws);
+      if (wi < words.length - 1) t.appendChild(document.createTextNode(' '));
+    });
+  }
+  function bloom(){
+    var set = ['❤️','💖','✨','💗','💕'], e = document.createElement('div');
+    e.className = 'bloom'; e.textContent = set[Math.floor(Math.random()*set.length)];
+    e.style.left = (8 + Math.random()*80) + '%'; e.style.top = (12 + Math.random()*50) + '%';
+    e.style.fontSize = (18 + Math.random()*30) + 'px';
+    fx.appendChild(e); setTimeout(function(){ e.remove() }, 2500);
+  }
+  function walker(){
+    var e = document.createElement('div'); e.className = 'walker';
+    e.innerHTML = '<span class="flip"><span class="hop">' + (Math.random() < .5 ? '🐈' : '🐱') + '</span></span>';
+    fx.appendChild(e); setTimeout(function(){ e.remove() }, 15000);
+  }
+  $('finbtn').addEventListener('click', function(){
+    buildTitle();
+    fin.classList.add('show'); fin.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    burst();
+    for (var i=0;i<14;i++) setTimeout(spawnFx, i*120);
+    finTimer = setInterval(spawnFx, 280);
+    bloomTimer = setInterval(bloom, 420);
+    walkFirst = setTimeout(walker, 4000);
+    walkTimer = setInterval(walker, 16000);
+    bgm.pause(); syncDock();
+    song.currentTime = 0;
+    var p = song.play(); if (p && p.catch) p.catch(function(){});
+    setTimeout(setFinPlay, 200);
+  });
+  $('finplay').addEventListener('click', function(){
+    if (song.paused){ var p = song.play(); if (p && p.catch) p.catch(function(){}); } else song.pause();
+    setTimeout(setFinPlay, 100);
+  });
+  $('finclose').addEventListener('click', function(){
+    fin.classList.remove('show'); fin.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    clearInterval(finTimer); clearInterval(bloomTimer); clearInterval(walkTimer); clearTimeout(walkFirst);
+    fx.querySelectorAll('.fx-item,.bloom,.walker').forEach(function(n){ n.remove() });
+    song.pause();
+  });
+
+  /* игра: поймай сердечки, потом чёрный экран и слова */
+  var GOAL = 15; // сколько сердечек нужно поймать
+  var LINES = [ // СЛОВА ФИНАЛА: меняй и добавляй свои, последняя строка — подпись
+    'Ты умничка)',
+    'Ты очень красивая — и снаружи, и внутри.',
+    'С тобой тепло и спокойно.',
+    'Ты умеешь поддержать, когда это нужнее всего.',
+    'Твоя улыбка делает любой день лучше.',
+    'Ты сильнее, чем думаешь.',
+    'Ты настоящая принцесса, и корона тебе не нужна.',
+    'Мне очень повезло, что ты есть.',
+    'Ты самая лучшая, Лерочка ❤️',
+    'от Лёшки'
+  ];
+  var game = $('game'), gfield = $('gfield'), gCount = 0, gTimer = null, gN = 0, gHint = null;
+  var eTimers = [], eStars = null, eHeartT = null;
+  function gClear(){ clearInterval(gTimer); clearTimeout(gHint); gfield.innerHTML = ''; }
+  function gSpawn(){
+    gN++;
+    var e = document.createElement('div'); e.className = 'gh';
+    e.textContent = gN % 7 === 0 ? '🐱' : hearts[Math.floor(Math.random()*hearts.length)];
+    e.style.left = Math.random()*Math.max(10, window.innerWidth - 80) + 'px';
+    var d = 3.4 + Math.random()*1.8; e.style.animationDuration = d + 's';
+    e.addEventListener('pointerdown', function(ev){ ev.preventDefault(); gCatch(e); });
+    gfield.appendChild(e);
+    setTimeout(function(){ if (!e.getAttribute('data-c')) e.remove(); }, d*1000 + 150);
+  }
+  function gCatch(e){
+    if (e.getAttribute('data-c')) return;
+    e.setAttribute('data-c', '1');
+    var r = e.getBoundingClientRect();
+    e.style.top = r.top + 'px';
+    e.style.animation = 'gcatch .35s ease-out forwards';
+    setTimeout(function(){ e.remove(); }, 400);
+    gCount++;
+    $('gcount').textContent = 'Поймано: ' + gCount + ' из ' + GOAL;
+    $('gfill').style.width = (gCount/GOAL*100) + '%';
+    if (gCount >= GOAL) gWin();
+  }
+  function gStart(){
+    gClear(); gCount = 0; gN = 0;
+    $('gcount').textContent = 'Поймано: 0 из ' + GOAL; $('gfill').style.width = '0';
+    $('ghint').style.opacity = 1;
+    game.classList.add('show'); game.setAttribute('aria-hidden', 'false');
+    gHint = setTimeout(function(){ $('ghint').style.opacity = 0; }, 3000);
+    gTimer = setInterval(gSpawn, 620); gSpawn();
+  }
+  function gWin(){ clearInterval(gTimer); setTimeout(function(){ gfield.innerHTML = ''; eStart(); }, 500); }
+  function gExit(){ gClear(); game.classList.remove('show'); game.setAttribute('aria-hidden', 'true'); }
+
+  function eClear(){
+    eTimers.forEach(clearTimeout); eTimers = [];
+    clearInterval(eStars); clearInterval(eHeartT);
+    $('efx').innerHTML = ''; $('eend').classList.remove('show');
+    $('etext').className = ''; $('etext').textContent = '';
+  }
+  function star(){
+    var s = document.createElement('div'); s.className = 'star'; s.textContent = '✦';
+    s.style.left = Math.random()*96 + '%'; s.style.top = Math.random()*92 + '%';
+    s.style.fontSize = (8 + Math.random()*16) + 'px';
+    s.style.animationDuration = (2 + Math.random()*2.5) + 's';
+    $('efx').appendChild(s); setTimeout(function(){ s.remove(); }, 4700);
+  }
+  function eHeart(){
+    var h = document.createElement('div'); h.className = 'eh';
+    h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.left = Math.random()*92 + '%'; h.style.fontSize = (18 + Math.random()*28) + 'px';
+    var d = 6 + Math.random()*4; h.style.animationDuration = d + 's';
+    h.style.setProperty('--sx', (Math.random()*80 - 40) + 'px');
+    $('efx').appendChild(h); setTimeout(function(){ h.remove(); }, d*1000);
+  }
+  function eLine(i){
+    var t = $('etext');
+    if (i >= LINES.length) return;
+    var txt = LINES[i], words = txt.split(' ');
+    t.className = i === 0 ? '' : (i === LINES.length - 1 ? 'sign2' : 'small');
+    t.textContent = '';
+    words.forEach(function(w, k){
+      var s = document.createElement('span'); s.className = 'ew'; s.textContent = w;
+      s.style.setProperty('--d', (k*0.22) + 's'); t.appendChild(s);
+      if (k < words.length - 1) t.appendChild(document.createTextNode(' '));
+    });
+    var hold = 1200 + words.length*220 + 1700;
+    if (i === LINES.length - 1){
+      eTimers.push(setTimeout(function(){ $('eend').classList.add('show'); }, 1800));
+      return;
+    }
+    eTimers.push(setTimeout(function(){ t.classList.add('out'); }, hold));
+    eTimers.push(setTimeout(function(){ eLine(i + 1); }, hold + 900));
+  }
+  function eStart(){
+    eClear();
+    $('end').classList.add('show'); $('end').setAttribute('aria-hidden', 'false');
+    eTimers.push(setTimeout(function(){ eStars = setInterval(star, 320); eHeartT = setInterval(eHeart, 750); }, 1500));
+    eTimers.push(setTimeout(function(){ eLine(0); }, 2000));
+  }
+  function eClose(){ eClear(); $('end').classList.remove('show'); $('end').setAttribute('aria-hidden', 'true'); }
+  $('gamebtn').addEventListener('click', gStart);
+  $('gexit').addEventListener('click', gExit);
+  $('eagain').addEventListener('click', function(){ eClose(); gStart(); });
+  $('eclose').addEventListener('click', function(){ eClose(); gExit(); });
+
+  /* открытка 3 */
+  var last = -1;
+  $('missbtn').addEventListener('click', function(){
+    var i; do { i = Math.floor(Math.random()*MISS.length) } while (i === last && MISS.length > 1);
+    last = i; $('miss').textContent = MISS[i];
+  });
+})();
+</script>
+</body>
+</html>
